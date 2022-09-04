@@ -1,0 +1,88 @@
+vishal@Macbook doc % az account list
+[
+  {
+    "cloudName": "AzureCloud",
+    "homeTenantId": "8b9078e1-bdfe-4173-a3ff-df0d38691c12",
+    "id": "d2d62502-0a05-41d7-bef1-83ed39497a23",
+    "isDefault": true,
+    "managedByTenants": [],
+    "name": "Azure Pass - Sponsorship",
+    "state": "Enabled",
+    "tenantId": "8b9078e1-bdfe-4173-a3ff-df0d38691c12",
+    "user": {
+      "name": "v2verma90@gmail.com",
+      "type": "user"
+    }
+  }
+]
+vishal@Macbook doc % kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://myaks-dns-6c69ba49.hcp.eastus.azmk8s.io:443
+  name: myaks
+contexts:
+- context:
+    cluster: myaks
+    user: clusterUser_KubeCourse_myaks
+  name: myaks
+current-context: myaks
+kind: Config
+preferences: {}
+users:
+- name: clusterUser_KubeCourse_myaks
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+    token: REDACTED
+vishal@Macbook doc % kubectl get pods -o wide
+No resources found in default namespace.
+vishal@Macbook doc % kubectl apply -f app.yaml
+deployment.apps/nginx-deployment created
+vishal@Macbook doc % kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   2/2     2            2           11s
+vishal@Macbook doc % kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.0.0.1     <none>        443/TCP   4m41s
+vishal@Macbook doc % kubectl get pods -o wide
+NAME                               READY   STATUS    RESTARTS   AGE   IP            NODE                                NOMINATED NODE   READINESS GATES
+nginx-deployment-9456bbbf9-n7t6v   1/1     Running   0          26s   10.244.1.19   aks-agentpool-27451825-vmss000001   <none>           <none>
+nginx-deployment-9456bbbf9-s22zg   1/1     Running   0          26s   10.244.1.20   aks-agentpool-27451825-vmss000001   <none>           <none>
+vishal@Macbook doc % kubectl apply -f service-LB.yaml
+service/nginx created
+vishal@Macbook doc % kubectl get svc
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP      10.0.0.1      <none>        443/TCP        5m51s
+nginx        LoadBalancer   10.0.205.72   <pending>     80:30395/TCP   6s
+vishal@Macbook doc % kubectl get svc
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
+kubernetes   ClusterIP      10.0.0.1      <none>          443/TCP        6m2s
+nginx        LoadBalancer   10.0.205.72   40.76.147.236   80:30395/TCP   17s
+vishal@Macbook doc % curl 40.76.147.236:80
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
